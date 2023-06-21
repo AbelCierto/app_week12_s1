@@ -14,8 +14,13 @@ class ItemListDialog{
       txtQuantity.text = item.quantity;
       txtNote.text = item.note;
     }
+    else{
+      txtName.text = '';
+      txtQuantity.text = '';
+      txtNote.text = '';
+    }
     return AlertDialog(
-      title: Text((isNew)? 'New Shopping List': 'Edit Shopping List'),
+      title: Text((isNew)? 'New Item List': 'Edit Item List'),
       content: SingleChildScrollView(
         child: Column(
           children: <Widget>[

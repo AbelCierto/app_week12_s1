@@ -31,6 +31,29 @@ class DbHelper{
     return db!;
   }
 
+  Future deleteLists(int id) async{
+    await openDb();
+    await db!.delete(
+      'items',
+      where: 'idList = ?',
+      whereArgs: [id],
+    );
+    await db!.delete(
+      'lists',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future deleteItems(int id) async{
+    await openDb();
+    await db!.delete(
+      'items',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
   //Vamos a probar la BD
   Future testDB() async{
     db = await openDb();
@@ -70,6 +93,8 @@ class DbHelper{
     final List<Map<String, dynamic>> maps = await db!.query('items',
         where: 'idList = ?',
         whereArgs: [idList]);
+    List places = await db!.query('SELECT * FROM items where idList = 1');
+    print(places);
     return List.generate(maps.length, (i) {
       return ListItem(
         maps[i]['id'],

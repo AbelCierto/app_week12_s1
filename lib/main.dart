@@ -54,25 +54,44 @@ class _ShowListState extends State<ShowList> {
       ),
       body: ListView.builder(
           itemCount: (shoppingList != null) ? shoppingList.length : 0,
-          itemBuilder: (context,int index) {
-            return ListTile(
-              title: Text(shoppingList[index].name),
-              leading: CircleAvatar(
-                child: Text(shoppingList[index].priority.toString()),
+          itemBuilder: (BuildContext context, int index){
+            return Dismissible(
+              key: Key(shoppingList[index].id.toString()),
+              background: Container(
+                  color: Colors.red[400],
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.only(left: 10.0),
+                  child: const Icon(Icons.delete_outline_rounded, color: Colors.white)
               ),
-              trailing: IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () async {
-                  showDialog(context: context, builder: (BuildContext context) => dialog!.buildDialog(
-                      context, shoppingList[index], false));
+              secondaryBackground: Container(
+                  color: Colors.red[400],
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 10.0),
+                  child: const Icon(Icons.delete_outline_rounded, color: Colors.white)
+              ),
+
+              onDismissed: (direction) async {
+                await deleteLists(shoppingList[index].id).then((value) => showData());
+              },
+
+              child: ListTile(
+                title: Text(shoppingList[index].name),
+                leading: CircleAvatar(
+                  child: Text(shoppingList[index].priority.toString()),
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () async {
+                    showDialog(context: context, builder: (BuildContext context) => dialog!.buildDialog(
+                        context, shoppingList[index], false));
+                  },
+                ),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ItemScreen(shoppingList: shoppingList[index])));
                 },
               ),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ItemScreen(shoppingList: shoppingList[index])));
-              },
             );
           }
-
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -81,9 +100,24 @@ class _ShowListState extends State<ShowList> {
               context, list, true));
         },
         child: const Icon(Icons.plus_one),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.blueAccent,
       )
     );
+  }
+
+  Future deleteLists(int id) async {
+    await helper.deleteLists(id);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Shopping List Deleted'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+    if(mounted){
+      setState(() {
+        shoppingList = shoppingList;
+      });
+    }
   }
 
   Future showData() async {
@@ -95,4 +129,3 @@ class _ShowListState extends State<ShowList> {
     });
   }
 }
-
